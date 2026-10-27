@@ -43,11 +43,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse CLI arguments."""
     p = argparse.ArgumentParser(
         prog="swarm",
-        description="Bio-Mimetic Swarm - decentralized multi-agent simulation "
+        description="Bio-Mimetic Swarm - decentralised multi-agent simulation "
                     "using Lennard-Jones artificial potential fields.",
         epilog=(
             "Examples:\n"
-            "  python -m swarm                              # default oil-spill scenario\n"
+            "  python -m swarm                              # default drifting-target scenario\n"
             "  python -m swarm --scenario tight-crystal      # named preset\n"
             "  python -m swarm --agents 100 --epsilon 40     # custom parameters\n"
             "  python -m swarm --sensor-noise 2 --dropout .1 # noisy conditions\n"
@@ -65,7 +65,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     g_scenario = p.add_argument_group("scenario")
     g_scenario.add_argument(
         "--scenario", "-s", type=str, default=None,
-        help="named scenario preset (e.g. oil-spill, tight-crystal)",
+        help="named scenario preset (e.g. drifting-target, tight-crystal)",
     )
 
     g_physics = p.add_argument_group("physics")

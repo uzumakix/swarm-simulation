@@ -22,8 +22,8 @@ class SwarmConfig:
     """Immutable, validated configuration for a single simulation run."""
 
     # ── Scenario metadata ──────────────────────────────────────────────────
-    scenario_name: str = "oil-spill"
-    scenario_description: str = "Track a drifting oceanographic target"
+    scenario_name: str = "drifting-target"
+    scenario_description: str = "Follow a slowly drifting target"
 
     # ── Agent count ────────────────────────────────────────────────────────
     num_agents: int = 50
@@ -137,7 +137,7 @@ class SwarmConfig:
         """One-line summary for console output."""
         return (
             f"Scenario: {self.scenario_name}  ·  "
-            f"{self.num_agents} ASVs  ·  "
+            f"{self.num_agents} agents  ·  "
             f"ε={self.epsilon}  σ={self.sigma}m  ·  "
             f"k_att={self.target_gain}  k_d={self.damping}  ·  "
             f"Δt={self.dt}s × {self.steps} steps"

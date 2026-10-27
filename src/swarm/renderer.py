@@ -145,7 +145,7 @@ def build_figure(cfg: SwarmConfig) -> tuple[
     ax_sim.set_xlabel("East  [m]", fontsize=AXIS_LABEL_SIZE)
     ax_sim.set_ylabel("North  [m]", fontsize=AXIS_LABEL_SIZE)
     ax_sim.set_title(
-        "AUTONOMOUS SURFACE VESSEL SWARM",
+        "LENNARD-JONES SWARM",
         fontsize=AXIS_TITLE_SIZE, fontfamily="monospace", pad=6,
     )
 
@@ -229,7 +229,7 @@ def build_figure(cfg: SwarmConfig) -> tuple[
     )
     fig.text(
         0.05, 0.912,
-        f"N={cfg.num_agents} ASVs  \u00b7  \u03b5={cfg.epsilon}  \u00b7  "
+        f"N={cfg.num_agents} agents  \u00b7  \u03b5={cfg.epsilon}  \u00b7  "
         f"\u03c3={cfg.sigma}m  \u00b7  k_att={cfg.target_gain}  \u00b7  "
         f"k_d={cfg.damping}  \u00b7  \u0394t={cfg.dt}s{noise_tag}",
         color=SUBTITLE_COLOR, fontsize=SUBTITLE_FONT_SIZE, fontfamily="monospace",
@@ -302,7 +302,7 @@ def make_update_fn(
         artists["hud_text"].set_text(
             f"CONTROL: LENNARD-JONES APF\n"
             f"t    = {fr['t']:6.1f} s\n"
-            f"N    = {cfg.num_agents} ASVs\n"
+            f"N    = {cfg.num_agents} agents\n"
             f"\u03c3    = {cfg.sigma} m  |  \u03b5 = {cfg.epsilon}\n"
             f"\u0394    = {dist_to_target:5.1f} m  (centroid \u2192 target)\n"
             f"v\u0304    = {fr['speed']:4.2f} m/s\n"

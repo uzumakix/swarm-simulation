@@ -96,7 +96,7 @@ class SwarmEngine:
 
     def target_position(self, t: Optional[float] = None) -> np.ndarray:
         """
-        Lissajous trajectory simulating a drifting oceanographic phenomenon.
+        Lissajous trajectory: a smooth, slowly drifting target.
 
         x(t) = A_x · sin(ω_x · t)
         y(t) = A_y · sin(ω_y · t + φ)

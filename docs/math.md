@@ -4,7 +4,7 @@ This document provides the complete derivation of the control law used in the bi
 
 ## 1. Agent Dynamics
 
-Each Autonomous Surface Vessel (ASV) is modelled as a **double-integrator point mass** with linear viscous damping:
+Each agent is modelled as a **double-integrator point mass** with linear viscous damping:
 
 $$\ddot{\mathbf{x}}_i = \mathbf{u}_i - k_d \dot{\mathbf{x}}_i$$
 
@@ -81,7 +81,7 @@ The target trajectory is a Lissajous curve:
 
 $$x_t(t) = A_x \sin(\omega_x t), \quad y_t(t) = A_y \sin(\omega_y t + \varphi)$$
 
-This simulates a drifting oceanographic phenomenon (oil spill, algal bloom) with smooth, time-varying motion.
+This gives the target smooth, time-varying motion that never repeats exactly.
 
 ## 4. Total Control Law
 
@@ -115,7 +115,7 @@ Together with the symplectic integrator, this allows stable simulation at relati
 
 ## 6. Sensor Noise Model
 
-Real vessels have imperfect range sensors. The simulation optionally adds Gaussian noise to measured pairwise distances:
+Real hardware has imperfect range sensors. The simulation optionally adds Gaussian noise to measured pairwise distances:
 
 $$\tilde{r}_{ij} = r_{ij} + \mathcal{N}(0, \sigma_{noise}^2)$$
 
@@ -123,6 +123,6 @@ The noise is symmetrised ($\tilde{r}_{ij} = \tilde{r}_{ji}$) and clamped to non-
 
 ## 7. Communication Dropout
 
-Each pairwise interaction has a probability $p_{drop}$ of being disabled per timestep. This models radio link failures in ocean environments. The dropout is also symmetrised. If agent $i$ cannot sense $j$, then $j$ also cannot sense $i$.
+Each pairwise interaction has a probability $p_{drop}$ of being disabled per timestep. This models intermittent link failures between agents. The dropout is also symmetrised. If agent $i$ cannot sense $j$, then $j$ also cannot sense $i$.
 
 The decentralized control law degrades gracefully under dropout because each agent still has partial information from its remaining neighbours. This is a key advantage over centralized control, where a single link failure can compromise the entire system.

@@ -41,8 +41,8 @@ class TestSwarmConfig:
     def test_summary_contains_key_info(self) -> None:
         cfg = SwarmConfig()
         s = cfg.summary()
-        assert "50 ASVs" in s
-        assert "oil-spill" in s
+        assert "50 agents" in s
+        assert "drifting-target" in s
         assert "ε=80.0" in s
 
     def test_custom_values(self) -> None:
@@ -129,4 +129,4 @@ class TestScenarioListing:
         result = list_scenarios()
         # These should exist in our scenarios/ directory
         if result:  # only assert if scenarios dir is accessible
-            assert "oil_spill" in result
+            assert "drifting_target" in result
