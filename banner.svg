@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0e1117"/>
+      <stop offset="100%" style="stop-color:#161b22"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#06b6d4"/>
+      <stop offset="100%" style="stop-color:#22d3ee"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" rx="12" fill="url(#bg)"/>
+
+  <!-- Subtle grid lines -->
+  <g stroke="#1f2937" stroke-width="0.5" opacity="0.5">
+    <line x1="0" y1="50" x2="800" y2="50"/>
+    <line x1="0" y1="100" x2="800" y2="100"/>
+    <line x1="0" y1="150" x2="800" y2="150"/>
+    <line x1="200" y1="0" x2="200" y2="200"/>
+    <line x1="400" y1="0" x2="400" y2="200"/>
+    <line x1="600" y1="0" x2="600" y2="200"/>
+  </g>
+
+  <!-- Swarm dots (decorative) -->
+  <g fill="#06b6d4" opacity="0.6">
+    <circle cx="580" cy="85" r="3"/>
+    <circle cx="598" cy="78" r="3"/>
+    <circle cx="615" cy="90" r="3"/>
+    <circle cx="595" cy="100" r="3"/>
+    <circle cx="610" cy="72" r="3"/>
+    <circle cx="625" cy="82" r="3"/>
+    <circle cx="588" cy="92" r="3"/>
+    <circle cx="605" cy="105" r="3"/>
+    <circle cx="620" cy="95" r="3"/>
+    <circle cx="635" cy="88" r="3"/>
+    <circle cx="575" cy="98" r="3"/>
+    <circle cx="640" cy="75" r="3"/>
+    <circle cx="612" cy="112" r="3"/>
+    <circle cx="630" cy="102" r="3"/>
+    <circle cx="650" cy="92" r="3"/>
+  </g>
+
+  <!-- Tail trails -->
+  <g stroke="#0e7490" stroke-width="1" fill="none" opacity="0.4">
+    <path d="M560,95 Q570,90 580,85"/>
+    <path d="M578,68 Q588,73 598,78"/>
+    <path d="M595,100 Q605,95 615,90"/>
+    <path d="M575,110 Q585,100 595,100"/>
+    <path d="M590,62 Q600,67 610,72"/>
+  </g>
+
+  <!-- Target cross -->
+  <g stroke="#ef4444" stroke-width="2.5" opacity="0.8">
+    <line x1="700" y1="80" x2="700" y2="100"/>
+    <line x1="690" y1="90" x2="710" y2="90"/>
+  </g>
+  <circle cx="700" cy="90" r="12" stroke="#ef4444" stroke-width="1" fill="none" opacity="0.4"/>
+
+  <!-- Title text -->
+  <text x="40" y="82" font-family="monospace" font-size="28" font-weight="bold" fill="url(#cyan)">
+    BIO-MIMETIC SWARM
+  </text>
+  <text x="40" y="115" font-family="monospace" font-size="14" fill="#64748b">
+    Lennard-Jones Artificial Potential Fields
+  </text>
+
+  <!-- Accent line -->
+  <rect x="40" y="130" width="200" height="2" rx="1" fill="#06b6d4" opacity="0.5"/>
+
+  <!-- Subtitle -->
+  <text x="40" y="158" font-family="monospace" font-size="11" fill="#94a3b8">
+    Decentralized multi-agent control for autonomous ocean monitoring
+  </text>
+
+  <!-- Border accent -->
+  <rect x="0" y="0" width="800" height="200" rx="12" fill="none" stroke="#1f2937" stroke-width="1"/>
+  <rect x="0" y="196" width="800" height="4" rx="0" fill="#06b6d4" opacity="0.3"/>
+</svg>

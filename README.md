@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="results/swarm_banner.png" width="720" />
+</p>
+
 # Multi-agent spatial coverage with Lennard-Jones potential fields
 
 Sixty agents released as a random cloud settle into a lattice whose nearest-neighbour spacing is
