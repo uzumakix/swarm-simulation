@@ -1,135 +1,110 @@
-<p align="center">
-  <img src="results/swarm_banner.png" width="720" />
-</p>
+# Multi-agent spatial coverage with Lennard-Jones potential fields
 
-## Project rationale
+Sixty agents released as a random cloud settle into a lattice whose nearest-neighbour spacing is
+8.907 metres, against the 8.980 metres the Lennard-Jones potential predicts for this setting of
+sigma. That is a difference of 0.81 per cent, and 95 per cent of agents sit between 8.858 and 8.980
+metres. No agent is told where to go: each one computes its own acceleration from the distances to
+its neighbours and from one attraction term pointing at the target.
 
-Imagine 50 tiny robots in a room. Each one follows two simple rules: don't crash into your neighbor, and spread out to cover the whole room. Like how birds fly in a flock without a leader telling them where to go. The code simulates this and measures how much floor they cover.
+With damping switched off, total energy changes by 0.067 per cent over 20,000 steps, with the largest
+excursion along the way reaching 0.508 per cent. That is the test that matters for the integrator,
+because an ordinary Euler step bleeds or gains energy steadily and this one does not.
 
-# Multi-Agent Spatial Coverage Simulation
+![Sixty agents at rest in a lattice, beside a histogram of nearest-neighbour distances with the
+Lennard-Jones minimum marked](results/figures/01_spacing_vs_theory.png)
 
-Decentralized coverage simulator built on Lennard-Jones potential fields and a sweep heuristic. Each agent computes its heading from neighbor positions and local coverage state. The question it answers: given N agents with limited sensing range, how quickly can they sweep a region using only local information?
+## What the agents actually do
 
+Each agent is a point mass. At every step it feels two things: a Lennard-Jones force from every other
+agent within the cutoff, and a pull toward the current target position. Nothing else. There is no
+shared map, no plan handed down, and no agent that knows what the others are doing beyond the
+distances it can measure.
 
-## What the project finds
-
-50 autonomous agents launched from a single point achieve **99.9% grid coverage** of a 400x400 meter search area in 1500 timesteps using only local sensing (25-meter radius). No agent has access to global state. The emergent search pattern fans outward from the launch point, with agents naturally partitioning space through separation pressure and sweep bias toward unvisited cells.
-
-Coverage grows sublinearly: the fleet covers 25% by step 96, 50% by step 180, and 75% by step 292. Beyond 90% coverage, marginal returns diminish sharply as agents must traverse longer paths to reach isolated unvisited cells in corners and boundaries.
-
-### Search Trajectories
-
-<p align="center">
-  <img src="results/trajectory_sweep.png" width="600" />
-</p>
-
-### Coverage Over Time
-
-<p align="center">
-  <img src="results/coverage_curve.png" width="600" />
-</p>
-
-## Mathematical formulation
-
-Each agent $i$ updates its velocity $\mathbf{v}_i$ at each timestep by computing a weighted sum of four normalized steering vectors:
-
-$$\mathbf{v}_i^{(t+1)} = \mathbf{v}_i^{(t)} + w_s \hat{\mathbf{f}}_s + w_a \hat{\mathbf{f}}_a + w_c \hat{\mathbf{f}}_c + w_r \hat{\mathbf{f}}_r$$
-
-where:
-
-| Symbol | Weight | Definition |
-|--------|--------|------------|
-| $\hat{\mathbf{f}}_s$ | $w_s = 2.0$ | **Separation**: $\sum_{j \in N_i} \frac{\hat{\mathbf{r}}_{ij}}{\|\mathbf{r}_{ij}\|^2}$ (inverse-square repulsion for $d < 8$m) |
-| $\hat{\mathbf{f}}_a$ | $w_a = 0.3$ | **Alignment**: $\frac{1}{|N_i|} \sum_{j \in N_i} \mathbf{v}_j - \mathbf{v}_i$ (velocity matching) |
-| $\hat{\mathbf{f}}_c$ | $w_c = 0.5$ | **Cohesion**: $\frac{1}{|N_i|} \sum_{j \in N_i} \mathbf{p}_j - \mathbf{p}_i$ (center-of-mass attraction) |
-| $\hat{\mathbf{f}}_r$ | $w_r = 1.8$ | **Sweep heuristic**: $\mathbf{c}^* - \mathbf{p}_i$ where $\mathbf{c}^*$ is the nearest unvisited cell center |
-
-All four vectors are normalized to unit magnitude before weighting. $N_i$ is the set of agents within the perception radius $r = 25$m of agent $i$. The speed is clamped to $[0.3, 1.8]$ m/timestep after summation.
-
-The simulation uses a **synchronous two-pass update**: all agents compute $\mathbf{v}_i^{(t+1)}$ from the frozen state at time $t$, then all positions update simultaneously. This eliminates dependence on agent indexing order.
-
-## How it works
-
-**1. The Agent Math (`agents.py`)**
-
-Each vessel computes a steering vector from four components using only local information:
-
-| Component | Weight | Purpose |
-|-----------|--------|---------|
-| Separation | 2.0 | Inverse-square repulsion within 8m to prevent collision |
-| Alignment | 0.3 | Match heading with visible neighbors |
-| Cohesion | 0.5 | Steer toward local center of mass |
-| Sweep | 1.8 | Bias toward nearest unvisited grid cell (local window) |
-
-All four vectors are normalized before weighting, so the weights directly control relative influence. The final velocity is clamped to a maximum speed of 1.8 m/timestep with a minimum of 0.3 m/timestep to prevent stalling. This extends the Boids model (Reynolds 1987) with a spatial coverage objective.
-
-The sweep heuristic searches a local window of 8 grid cells around the agent and adds a small random offset to break ties. This prevents all agents from converging on the same target cell.
-
-**2. The Simulation Engine (`simulation.py`)**
-
-A kinematic loop spawns 50 agents at a central launch point with random initial headings. Each timestep uses a **two-pass update** to eliminate order-dependent behavior:
-1. All agents compute their steering vectors from the current frozen state.
-2. All agents apply their updates simultaneously.
-
-A discrete coverage grid (80x80 cells over 400x400 meters) tracks which cells have been visited. Agents are bounded to the search area via position clamping.
-
-**3. The Spatial Visualizer (`solve.py`)**
-
-Runs the simulation for 1500 timesteps and generates two plots. The trajectory plot overlays all 50 agent paths on the coverage grid, showing the fan-out pattern from the launch point. The coverage curve tracks the fraction of cells visited over time, with milestone annotations at 25%, 50%, and 75%.
-
-## Project structure
+The Lennard-Jones force is the one used for molecules:
 
 ```
-bio-mimetic-swarm/
-    agents.py               # vector math: separation, alignment, cohesion, sweep
-    simulation.py           # kinematic loop, coverage tracking, two-pass update
-    solve.py                # runner, trajectory plot, coverage curve
-    src/swarm/
-        engine.py           # physics engine with symplectic integration
-        config.py           # YAML scenario loader
-        forces_c.c          # C extension for pairwise LJ forces
-        forces_native.py    # pure Python fallback for force computation
-        renderer.py         # matplotlib trajectory and coverage renderer
-    configs/                # scenario presets (oil spill, search and rescue, stress test)
-    tests/                  # physics invariants and config validation
-    docs/                   # architecture, math derivations, requirements
-    results/                # output plots and banner images
+F(r) = 24 e [ 2 (s/r)^12 - (s/r)^6 ] / r
 ```
 
-## Assumptions and limitations
+Close in it pushes hard, which keeps agents from colliding. Further out it pulls gently, which keeps
+the group together. Between the two there is one distance where the force is zero, at `2^(1/6) s`,
+and that is the spacing the swarm should settle at. Measuring whether it does is the first check
+above, and it is the reason this potential was chosen over a plain spring: a spring has no hard core,
+so agents pass through one another.
 
-This simulation makes several simplifying assumptions:
+## The three checks
 
-- **No ocean currents or drift.** Agents move in a static fluid. Real ASVs must compensate for tides, wind, and wave drift.
-- **No communication latency.** Neighbor sensing is instantaneous within the perception radius. Real radio links introduce delay and packet loss.
-- **Infinite energy.** Agents never run out of fuel or battery. Real missions must account for return-to-base constraints.
-- **Flat 2D plane.** The search area has no obstacles, coastlines, or bathymetry. Real maritime environments are rarely featureless.
-- **Fixed fleet size.** No agents are added or lost during the mission. Real operations must handle agent failure and dynamic redeployment.
+Every number below comes from `make_results.py` in this repository, run with seed 20261026.
 
-Compared to structured algorithms (parallel sweep, Voronoi partitioning), the decentralized approach trades optimality for fault tolerance: no single agent failure can collapse the search plan. A formal comparison to these baselines is left as future work.
+**Spacing at rest.** 60 agents, sigma 8 metres, epsilon 150, 4000 steps at dt 0.05, attraction
+switched off so only the inter-agent forces act. Median nearest-neighbour distance 8.907 metres
+against a predicted 8.980. The small shortfall is expected: agents on the outside of the lattice have
+fewer neighbours pushing back, so the group packs slightly tighter than the two-body minimum.
 
-## Running
+**Energy drift.** 40 agents, damping set to zero, 20,000 steps at dt 0.01, started from a relaxed
+lattice rather than a random cloud. Starting from a cloud is meaningless here, because two agents
+landing almost on top of each other send the `r^-12` term to an enormous value and swamp everything
+else. Total energy, kinetic plus potential, moves by 0.067 per cent end to end.
+
+![Total energy against time with damping off, staying within half a per cent of its starting
+value](results/figures/02_energy_drift.png)
+
+**Following a moving target.** 50 agents, sigma 12 metres, the target tracing a slow Lissajous path.
+The centre of the swarm stays a median 0.65 metres from the target once it has settled. Spacing holds
+at 12.37 metres while moving, below the 13.47 metre minimum for this sigma, because the pull toward
+the target squeezes the group slightly. That compression is the honest result: formation and
+navigation trade against each other, and the attraction gain sets where the balance lands.
+
+![Swarm centre tracking a moving target, beside nearest-neighbour spacing held steady over
+time](results/figures/03_target_following.png)
+
+## Running it
 
 ```bash
 pip install -r requirements.txt
-python solve.py
+PYTHONPATH=src python make_results.py
 ```
 
-Results are saved to `results/`.
+For the animation instead of the figures:
+
+```bash
+PYTHONPATH=src python -m swarm --scenario tight-crystal
+```
+
+`python -m swarm --list-scenarios` shows the presets in `configs/`.
+
+## The C kernel
+
+`src/swarm/forces_c.c` computes the pairwise forces in C, loaded through ctypes. It needs building
+first:
+
+```bash
+gcc -O2 -shared -o src/swarm/forces_c.dll src/swarm/forces_c.c    # Windows
+gcc -O2 -shared -fPIC -o src/swarm/forces_c.so src/swarm/forces_c.c
+```
+
+Without it the code falls back to a pure Python loop and warns that it has done so. The numbers above
+were produced with the vectorised NumPy path in `engine.py`, which is what runs when you have no
+compiler, so nothing here depends on the C build.
+
+## What this does not do
+
+- Agents feel each other through exact distances. Real hardware measures with error, and the
+  `--sensor-noise` and `--dropout` flags exist to explore that, although no result above uses them.
+- The boundary is a hard wall with a restitution of 0.5. Agents bounce off it rather than being
+  steered away, which is cruder than anything a real system would do.
+- The target path is a fixed curve rather than something that reacts to the swarm.
+- Formation is measured, coverage of ground is not. A lattice holding its shape is a different claim
+  from sweeping an area, and only the first one is tested here.
 
 ## References
 
-1. Reynolds, C. W. (1987). "Flocks, Herds, and Schools: A Distributed Behavioral Model." *Computer Graphics (SIGGRAPH '87 Proceedings)*, 21(4), 25-34.
+1. Lennard-Jones, J. E. (1931). Cohesion. *Proceedings of the Physical Society*, 43(5), 461-482.
+2. Khatib, O. (1986). Real-time obstacle avoidance for manipulators and mobile robots.
+   *The International Journal of Robotics Research*, 5(1), 90-98.
+3. Hairer, E., Lubich, C. & Wanner, G. (2003). Geometric numerical integration illustrated by the
+   Stormer-Verlet method. *Acta Numerica*, 12, 399-450.
 
-2. Koopman, B. O. (1980). *Search and Screening: General Principles with Historical Applications*. Pergamon Press. ISBN 978-0080231358.
-
-3. Breivik, O. & Allen, A. A. (2008). "An Operational Search and Rescue Model for the Norwegian Sea and the North Sea." *Journal of Marine Systems*, 69(1-2), 99-113.
-
-
-## Active Research Extension
-
-- This engine is being adapted for port logistics. The same coordination framework (local sensing, decentralized velocity updates, spatial coverage tracking) applies to analyzing freight movement workflows and identifying throughput constraints across port terminals.
-- The thesis version replaces the open-sea search objective with a cargo distribution objective, measuring how efficiently autonomous transport nodes service a bounded logistics area.
 ## License
 
 MIT License. See [LICENSE](LICENSE).
