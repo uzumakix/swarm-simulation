@@ -94,8 +94,9 @@ compiler, so nothing here depends on the C build.
 - The boundary is a hard wall with a restitution of 0.5. Agents bounce off it rather than being
   steered away, which is cruder than anything a real system would do.
 - The target path is a fixed curve rather than something that reacts to the swarm.
-- Formation is measured, coverage of ground is not. A lattice holding its shape is a different claim
-  from sweeping an area, and only the first one is tested here.
+- What is measured is how the agents distribute themselves: the spacing they hold, whether that
+  spacing matches theory, and whether it survives being dragged across the domain. Sweeping an area
+  so that every cell gets visited is a related but separate objective, and it is not tested here.
 
 ## References
 
